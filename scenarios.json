@@ -1,2 +1,1 @@
-// scenarios.json
 {"version": "1.5", "start": "q1", "nodes": {"q1": {"text": "Тест", "type": "solution", "action": "resolve"}}}
