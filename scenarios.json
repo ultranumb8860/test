@@ -1,1 +1,246 @@
-{"version": "1.5", "start": "q1", "nodes": {"q1": {"text": "Тест", "type": "solution", "action": "resolve"}}}
+{
+  "version": "1.4",
+  "instruction": "ИНСТРУКЦИЯ ДЛЯ L1\n\n1. Всегда запускайте «Диагностику» при любом техническом обращении.\n2. Строго следуйте шагам — отклонение запрещено.\n3. При эскалации обязательно прикладывайте лог.\n4. Проверяйте обновления сценариев ежедневно.\n5. Поля VIN, ФИО и контакт клиента обязательны при передаче на L2.",
+  "start": "q_problem_type",
+  "nodes": {
+    "q_problem_type": {
+      "text": "Выберите причину обращения:",
+      "type": "question",
+      "answers": [
+        {"text": "Не работают функции в приложении", "next": "q_check_basics_1"},
+        {"text": "Не обновляются данные телеметрии", "next": "q_check_basics_2"},
+        {"text": "Некорректная геолокация", "next": "end_escalate_l2"},
+        {"text": "Проблема со входом в аккаунт", "next": "q_login_issue_type"},
+        {"text": "Отопитель", "next": "q_heater_issue"},
+        {"text": "ЭЗС (зарядные станции)", "next": "q_evs_issue"},
+        {"text": "Другое", "next": "q_other_category"}
+      ]
+    },
+
+    "q_check_basics_1": {
+      "text": "Проверьте:\n1. Установлена ли последняя версия приложения?\n2. Вы вошли в правильный аккаунт?\n3. Есть ли интернет на устройстве? В месте где стоит авто, есть проблема с работой мобильного интернета?\n\nПроблема осталась?",
+      "type": "question",
+      "answers": [
+        {"text": "Да, проблема осталась", "next": "q_car_visible"},
+        {"text": "Есть проблема с работой мобильного интернета в месте где стоит авто/не уверен", "next": "end_resolved_basics2"},
+        {"text": "Нет, всё заработало", "next": "end_resolved_basics"}
+      ]
+    },
+    "q_check_basics_2": {
+      "text": "Проверьте:\n1. Установлена ли последняя версия приложения?\n2. Вы вошли в правильный аккаунт?\n3. Есть ли интернет на устройстве? В месте где стоит авто, есть проблема с работой мобильного интернета?\n\nПроблема осталась?",
+      "type": "question",
+      "answers": [
+        {"text": "Да, проблема осталась", "next": "q_telemetry_type"},
+        {"text": "Есть проблема с работой мобильного интернета в месте где стоит авто/не уверен", "next": "end_resolved_basics2"},
+        {"text": "Нет, всё заработало", "next": "end_resolved_basics"}
+      ]
+    },
+
+    "q_car_visible": {
+      "text": "Отображается ли ваш автомобиль в приложении?",
+      "type": "question",
+      "answers": [
+        {"text": "Нет", "next": "q_owner_type"},
+        {"text": "Да", "next": "q_app_status"}
+      ]
+    },
+    "q_owner_type": {
+      "text": "Автомобиль оформлен на физическое или юридическое лицо?",
+      "type": "question",
+      "answers": [
+        {"text": "Физическое лицо", "next": "end_goto_dealer_no_rights"},
+        {"text": "Юридическое лицо", "next": "end_escalate_l2"}
+      ]
+    },
+    "q_app_status": {
+      "text": "Какой статус автомобиля отображается в приложении?",
+      "type": "question",
+      "answers": [
+        {"text": "Доступен", "next": "q_functions_all_or_part"},
+        {"text": "Нет данных", "next": "q_last_update_time"},
+        {"text": "Не подключён", "next": "end_goto_dealer_not_connected"},
+        {"text": "Идет зарядка", "next": "end_status_charging"},
+        {"text": "Включено зажигание", "next": "end_status_ignition_on"}
+      ]
+    },
+    "q_functions_all_or_part": {
+      "text": "Как работают функции?\n\n❗ Функция «Открыть багажник» доступна только при закрытом центральном замке.",
+      "type": "question",
+      "answers": [
+        {"text": "Не работают вообще", "next": "end_escalate_l2"},
+        {"text": "Работают частично", "next": "end_escalate_l2"},
+        {"text": "Работают нестабильно (то да, то нет)", "next": "end_network_explanation"}
+      ]
+    },
+    "q_last_update_time": {
+      "text": "Когда данные обновлялись в последний раз? (указано в приложении)",
+      "type": "question",
+      "answers": [
+        {"text": "Более 10 часов назад", "next": "end_goto_dealer_no_signal"},
+        {"text": "Менее 10 часов назад", "next": "end_network_explanation_maybe_l2"}
+      ]
+    },
+
+    "q_telemetry_type": {
+      "text": "Как именно не обновляются данные?",
+      "type": "question",
+      "answers": [
+        {"text": "Вообще не обновляются", "next": "q_telemetry_status"},
+        {"text": "Не обновляются после ночной стоянки", "next": "end_telemetry_night_expl"},
+        {"text": "Данные зависли (некорректные значения)", "next": "end_escalate_l2"}
+      ]
+    },
+    "q_telemetry_status": {
+      "text": "Какой статус автомобиля в приложении?",
+      "type": "question",
+      "answers": [
+        {"text": "Доступен", "next": "end_escalate_l2"},
+        {"text": "Нет данных", "next": "q_last_update_time"},
+        {"text": "Не подключён", "next": "end_goto_dealer_not_connected"}
+      ]
+    },
+
+    "q_login_issue_type": {
+      "text": "Уточните тип проблемы:",
+      "type": "question",
+      "answers": [
+        {"text": "Ошибка при входе", "next": "q_login_error_steps"},
+        {"text": "Не приходит SMS", "next": "q_sms_not_received"}
+      ]
+    },
+    "q_login_error_steps": {
+      "text": "Рекомендуем:\n1. Обновите приложение до последней версии.\n2. Переустановите приложение.\n3. Попробуйте войти с другого устройства.\n\nПроблема осталась?",
+      "type": "question",
+      "answers": [
+        {"text": "Да", "next": "end_escalate_l2"},
+        {"text": "Нет", "next": "end_resolved_basics"}
+      ]
+    },
+    "q_sms_not_received": {
+      "text": "Поступают ли другие SMS на этот номер (например, от банка)?",
+      "type": "question",
+      "answers": [
+        {"text": "Да", "next": "end_escalate_l2"},
+        {"text": "Нет", "next": "end_sms_operator"}
+      ]
+    },
+
+    "q_heater_issue": {
+      "text": "Выберите проблему:",
+      "type": "question",
+      "answers": [
+        {"text": "Добавить отопитель", "next": "end_heater_add"},
+        {"text": "Отопитель не работает", "next": "end_heater_not_working"}
+      ]
+    },
+
+    "q_evs_issue": {
+      "text": "Выберите проблему:",
+      "type": "question",
+      "answers": [
+        {"text": "Не работает оплата зарядной сессии", "next": "end_escalate_l2"},
+        {"text": "Не отображается зарядная сессия", "next": "end_escalate_l2"},
+        {"text": "Невозможно добавить карту", "next": "q_evs_card_issue"},
+        {"text": "Невозможно завершить зарядную сессию", "next": "end_evs_cant_stop"}
+      ]
+    },
+    "q_evs_card_issue": {
+      "text": "Проверьте срок действия карты. Попробуйте привязать другую карту. Проблема осталась?",
+      "type": "question",
+      "answers": [
+        {"text": "Да", "next": "end_escalate_l2"},
+        {"text": "Нет", "next": "end_resolved_basics"}
+      ]
+    },
+
+    "q_other_category": {
+      "text": "Уточните тип запроса:",
+      "type": "question",
+      "answers": [
+        {"text": "Переоформление SIM-карты мультимедиа на физическое лицо", "next": "end_sim_reassign"},
+        {"text": "Другой запрос", "next": "end_escalate_l2"}
+      ]
+    },
+
+    "end_resolved_basics": {
+      "text": "Проблема решена после проверки базовых условий.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_resolved_basics2": {
+      "text": "Сообщаем клиенту:\nУспех обработки команд автомобилем напрямую зависит от работы мобильного интернета в месте, где стоит авто.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_goto_dealer_no_rights": {
+      "text": "Автомобиль не отображается, так как дилер не передал права владения. Обратитесь к официальному дилеру для завершения подключения.",
+      "type": "solution",
+      "action": "redirect_to_dealer"
+    },
+    "end_goto_dealer_not_connected": {
+      "text": "Статус 'Не подключён' означает, что телематический блок не активирован или подключён с ошибкой. Требуется диагностика у дилера.",
+      "type": "solution",
+      "action": "redirect_to_dealer"
+    },
+    "end_goto_dealer_no_signal": {
+      "text": "Данные не обновлялись более 10 часов — возможна проблема с SIM-картой или подключением блока. Требуется физическая диагностика у дилера.",
+      "type": "solution",
+      "action": "redirect_to_dealer"
+    },
+    "end_network_explanation": {
+      "text": "Нестабильная работа функций связана с качеством мобильной сети в месте стоянки автомобиля. Возможны помехи (глушилки, подвалы, металлические гаражи). Мы работаем с операторами связи для улучшения покрытия.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_network_explanation_maybe_l2": {
+      "text": "Данные обновлялись недавно, но функции не работают — это может быть связано с качеством сети или настройками T-Box. Если проблема сохраняется, передадим запрос в техническую поддержку.",
+      "type": "solution",
+      "action": "escalate_if_needed"
+    },
+    "end_telemetry_night_expl": {
+      "text": "После ночной стоянки блок не опрашивает датчики без активности автомобиля (движение, открытие двери и т.п.). В будущих версиях появится обновление по свайпу вниз.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_escalate_l2": {
+      "text": "Требуется углубленная диагностика. Запрос передан второй линии поддержки. Приложите этот лог к тикету.",
+      "type": "solution",
+      "action": "escalate"
+    },
+    "end_sms_operator": {
+      "text": "Возможно, проблема на стороне оператора связи. Рекомендуем обратиться в поддержку вашего оператора.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_heater_add": {
+      "text": "Управление отопителем из приложения доступно только после его подключения к блоку телематики у официального дилера. Запрос передан в L2 для проверки технической возможности.",
+      "type": "solution",
+      "action": "escalate"
+    },
+    "end_heater_not_working": {
+      "text": "Управление отопителем из приложения доступно только после его подключения к блоку телематики у дилера. Если он ранее работал и перестал — требуется физическая диагностика. Проблему удалённо решить невозможно.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_evs_cant_stop": {
+      "text": "Рекомендуем завершить сессию:\n1. Через автомобиль (в меню зарядки).\n2. Через аварийную кнопку на зарядной станции.\n\n❗ После завершения не забудьте вернуть аварийную кнопку в исходное положение.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_status_charging": {
+      "text": "При статусе «Идет зарядка» функции удалённого управления недоступны. Это штатное поведение.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_status_ignition_on": {
+      "text": "При включенном зажигании функции удалённого управления недоступны. Это не сценарий использования приложения.",
+      "type": "solution",
+      "action": "resolve"
+    },
+    "end_sim_reassign": {
+      "text": "Для переоформления SIM-карты мультимедиа на физическое лицо перейдите по ссылке:\n\nhttps://voyah.su/pereoformlenie-sim-kart\n\nПосле заполнения формы данные будут обработаны в течение 3–5 рабочих дней.",
+      "type": "solution",
+      "action": "resolve"
+    }
+  }
+}
