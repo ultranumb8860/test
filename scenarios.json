@@ -37,7 +37,7 @@
         {"text": "Переоформление сим на физ лицо", "next": "q_sim_fiz"},
         {"text": "Переоформление сим на юр лицо", "next": "end_sim_jur"},
         {"text": "Активация промо-кода", "next": "end_sim_promo"},
-        {"text": "Узнать номер сим в мультимедиа Voyah", "next": "check_vin_phone"},
+        {"text": "Узнать номер сим в мультимедиа (только для Voyah)", "next": "check_vin_phone"},
         {"text": "Сим-карта МТС в телематике", "next": "end_sim_mts"}
       ]
     },
